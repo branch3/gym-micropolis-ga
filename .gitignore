@@ -10,3 +10,5 @@ runs*
 notes*
 
 *.pyc
+
+objs

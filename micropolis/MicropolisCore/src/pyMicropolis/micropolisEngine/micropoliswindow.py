@@ -360,7 +360,8 @@ class MicropolisPanedWindow(gtk.Window):
         dialog.destroy()
 
 
-    def generateCity(self):
+    def \
+            generateCity(self):
         print("GENERATECITY")
         self.engine.generateNewMetaCity()
 

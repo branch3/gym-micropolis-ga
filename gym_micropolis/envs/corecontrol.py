@@ -17,13 +17,13 @@ if sys.version_info[0] >= 3:
 else:
     MICROPOLISCORE_DIR = GIT_DIR + '/micropolis/MicropolisCore/src'
     sys.path.append(MICROPOLISCORE_DIR)
-    from tilemap import TileMap
+    #from tilemap import TileMap
 
 CURR_DIR = os.getcwd()
 # we need to do this so the micropolisgenericengine can access images/micropolisEngine/dataColorMap.png
 
 
-os.chdir(MICROPOLISCORE_DIR)   
+os.chdir(MICROPOLISCORE_DIR)
 
 #import micropolis
 from pyMicropolis.gtkFrontend import main
@@ -33,9 +33,9 @@ os.chdir(CURR_DIR)
 
 class MicropolisControl():
 
-    def __init__(self, MAP_W=12, MAP_H=12, PADDING=13, parallel_gui=False, rank=None):
+    def __init__(self, MAP_W=12, MAP_H=12, PADDING=13, parallel_gui=False, rank=None,display=True):
         self.SHOW_GUI=False
-        engine, win1 = main.train(bot=self, rank=rank)
+        engine, win1 = main.train(bot=self, rank=rank, display = display)
         os.chdir(CURR_DIR)
         self.engine = engine
         self.engine.setGameLevel(2)
@@ -48,9 +48,9 @@ class MicropolisControl():
         self.MAP_XS = 5
         self.MAP_YS = 5
         self.num_roads = 0
-        self.engineTools = ['Residential', 'Commercial', 'Industrial', 
-                'FireDept', 
-                'PoliceDept', 
+        self.engineTools = ['Residential', 'Commercial', 'Industrial',
+                'FireDept',
+                'PoliceDept',
                 # TODO: implement query (skipped for now by indexing)
                'Query',
                'Wire',
@@ -58,9 +58,9 @@ class MicropolisControl():
                'Rail',
                'Road',
                 'Stadium',
-                'Park', 
+                'Park',
                  'Seaport',
-                'CoalPowerPlant', 
+                'CoalPowerPlant',
                 'NuclearPowerPlant',
                 'Airport',
                 'Net',
@@ -69,19 +69,19 @@ class MicropolisControl():
                 'Forest',
                 ]
         # Names correspond to those of resultant zones
-        self.tools = ['Residential', 'Commercial', 'Industrial', 
-                'FireDept', 
-                'PoliceDept', 
-             # 'Query',
+        self.tools = ['Residential', 'Commercial', 'Industrial',
+                'FireDept',
+                'PoliceDept',
+             # 'Query',    if display :
                 'Clear',
                'Wire',
               #'Land',
                'Rail',
                'Road',
                 'Stadium',
-                'Park', 
+                'Park',
                  'Seaport',
-                'CoalPowerPlant', 
+                'CoalPowerPlant',
                 'NuclearPowerPlant',
                 'Airport',
                 'Net',
@@ -97,9 +97,15 @@ class MicropolisControl():
         self.num_zones = self.map.num_zones
         # allows building on rubble and forest
         self.engine.autoBulldoze = True
-        # for bots 
+        # for bots
         self.land_value = 0
-        win1.playCity()
+        if display :
+            win1.playCity()
+        else :
+            engine.setSpeed(2)
+            engine.setPasses(1)
+            engine.resume()
+            engine.setGameMode('play')
         self.engine.setFunds(1000000)
         engine.setSpeed(3)
         engine.setPasses(100)
@@ -131,10 +137,10 @@ class MicropolisControl():
                 # random zones
                 elif ((i + 2 - (i + 4) // w) % 3) ==0 and \
                      ((j + 2 - (j + 1) // h) % 3) ==0:
-     
+
                     tool_i = random.randint(0, 3-1)
                     self.doTool(i, j, ['Residential', 'Commercial', 'Industrial'][tool_i])
-    
+
     def newMap(self):
         self.engine.generateMap()
         self.updateMap()
@@ -152,7 +158,7 @@ class MicropolisControl():
             for j in range(self.MAP_Y):
                 tile_int = self.getTile(i,j)
                 zone = zoneFromInt(tile_int)
-                # assuming there are no zones not built via us, 
+                # assuming there are no zones not built via us,
                 # or else we must find center
                 self.map.updateTile(i, j, zone, (i,j))
 
@@ -204,16 +210,16 @@ class MicropolisControl():
         return self.doSimTool(x,y,'Clear')
 
     def doLandOver(self, x, y):
-        ''' a glitchy replacement to doBulldoze (layered buildings)
-        '''
+        """ a glitchy replacement to doBulldoze (layered buildings)
+        """
 
     def doBotTool(self, x, y, tool, static_build=False):
-        '''Takes string for tool'''
-        return self.map.addZoneBot(x + self.PADDING, y + self.PADDING, tool, static_build=static_build) 
+        """Takes string for tool"""
+        return self.map.addZoneBot(x + self.PADDING, y + self.PADDING, tool, static_build=static_build)
 
     def doTool(self, x, y, tool):
-        '''Takes string for tool'''
-        return self.map.addZoneBot(x, y, tool) 
+        """Takes string for tool"""
+        return self.map.addZoneBot(x, y, tool)
 
     def playerToolDown(self, tool_int, x, y):
         if not x < self.MAP_X and y < self.MAP_Y:
@@ -225,7 +231,7 @@ class MicropolisControl():
         self.player_builds += [(tool_int, x, y)]
 
     def toolDown(self, x, y, tool):
-        '''Takes int for tool, depending on engine's index'''
+        """Takes int for tool, depending on engine's index"""
         self.map.addZoneBot(x, y, self.engineTools[tool])
 
         # called by map module
@@ -264,7 +270,7 @@ class MicropolisControl():
         self.doTool(x, y, tool)
 
     def takeAction(self, a, static_build=False):
-        '''tool int depends on self.tools indexing'''
+        """tool int depends on self.tools indexing"""
         tool = self.tools[a[0]]
         x = int(a[1])
         y = int(a[2])
@@ -278,10 +284,7 @@ class MicropolisControl():
             for j in range(self.MAP_Y):
                 tileMap[i][j] = self.getTile(i, j)
         print(tileMap)
- 
+
     def close(self):
     #   self.engine.doReallyQuit()
         del(self.engine)
-
-
-

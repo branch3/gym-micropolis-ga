@@ -285,6 +285,18 @@ class MicropolisControl():
                 tileMap[i][j] = self.getTile(i, j)
         print(tileMap)
 
+    def getTileMap(self):
+        tileMap = np.zeros(shape=(self.MAP_X, self.MAP_Y))
+        for i in range(self.MAP_X):
+            for j in range(self.MAP_Y):
+                tileMap[i][j] = self.getTile(i, j)
+        return tileMap
+
     def close(self):
-    #   self.engine.doReallyQuit()
-        del(self.engine)
+        # I added this try catch so that we can always call the close function when in doubt
+        try:
+        #   self.engine.doReallyQuit()
+            del(self.engine)
+        except:
+            pass
+        return

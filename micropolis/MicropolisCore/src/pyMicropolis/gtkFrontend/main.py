@@ -89,7 +89,7 @@ def train(bot=None, rank=None, root_gtk=None, display = True):
         return engine, win1
 
     else :
-        print('No display')
+        #print('No display')
         engine.interests['gameMode'] = None
         engine.generateNewMetaCity()
         engine.setSpeed(2)
